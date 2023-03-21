@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
+import HomeView from '@/views/Homeview.vue'
 import AdminVue from '@/views/admin.vue'
 import LoginVue from '@/views/login.vue'
 import MyActivity from '@/views/myactivity.vue'
@@ -13,7 +13,7 @@ const router = createRouter({
     { path: '/',name: 'home',component: HomeView },
 
     { path: '/login', name: 'login', component: LoginVue },
-    { path: '/admin', name: 'admin', component: AdminVue, beforeEnter: secureRoute },
+    { path: '/admin', name: 'admin', component: AdminVue, beforeEnter: adminRoute },
     { path: '/myactivity', name: 'myactivity', component: MyActivity, beforeEnter: secureRoute },
     { path: '/friendsactivity', name: 'friendsactivity', component: FriendsActivity, beforeEnter: secureRoute },
     { path: '/peoplesearch', name: 'peoplesearch', component: PeopleSearch, beforeEnter: secureRoute }
@@ -33,6 +33,15 @@ export default router
 function secureRoute (to : RouteLocationNormalized, from : RouteLocationNormalized, next : NavigationGuardNext ) {
   const session = useSession();
   if (session.user) {
+      next()
+  } else { 
+      next('/login')
+  }
+}
+
+function adminRoute (to : RouteLocationNormalized, from : RouteLocationNormalized, next : NavigationGuardNext ) {
+  const session = useSession();
+  if (session.user?.isAdmin===true) {
       next()
   } else { 
       next('/login')
