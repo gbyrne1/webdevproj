@@ -1,4 +1,4 @@
-
+import userdata from "../data/users.json";
 import { reactive } from "vue";
 
 const session = reactive({
@@ -6,6 +6,7 @@ const session = reactive({
 })
 
 interface User {
+    id: number;
     firstname: string;
     lastname?: string;
     email?: string;
@@ -14,15 +15,18 @@ interface User {
     isAdmin?: boolean;
 }
 
+export function getUsers():User[]{
+    return userdata.users;
+}
+
 export function useSession() {
     return session;
 }
 
-export function login() {
-    session.user = {
-        firstname: "John Doe",
+export function login(User: User) {
+    session.user = User;
     }
-}
+
 
 
 
