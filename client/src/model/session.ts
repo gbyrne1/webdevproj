@@ -8,7 +8,6 @@ import type { DataEnvelope, DataListEnvelope } from "./myFetch";
 const session = reactive({
     user: null as User | null,
     isLoading: false,
-    redirectUrl: null as string | null,
     messages: [] as {
         msg: string,
         type: "success" | "error" | "warning" | "info",

@@ -10,7 +10,7 @@ import { useSession } from '@/model/session'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/',name: 'home',component: HomeView },
+    { path: '/',name: 'home',component: HomeView, beforeEnter: secureRoute },
 
     { path: '/login', name: 'login', component: LoginVue },
     { path: '/users', name: 'admin', component: AdminVue, beforeEnter: secureRoute },
