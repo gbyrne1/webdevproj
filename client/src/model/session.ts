@@ -12,6 +12,7 @@ const session = reactive({
         msg: string,
         type: "success" | "error" | "warning" | "info",
     }[],
+    redirectUrl: null as string | null,
 })
 
 export interface User {
