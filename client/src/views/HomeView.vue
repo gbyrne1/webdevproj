@@ -1,87 +1,58 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useSession } from '@/model/session';
-import { avgpace, getWorkouts,totaldist, totalcalories,totalduration} from '@/model/workouts';
+import { onMounted, reactive, ref } from 'vue';
+import { login, useSession } from '@/model/session';
+import Statbox from '@/components/Statbox.vue';
+import type { DataListEnvelope } from '@/model/myFetch';
+import { getWorkoutsbyHandleorEmail, type Workout } from '@/model/workouts';
+const workouts = reactive<DataListEnvelope<Workout>>({ data: [], total: 0, isSuccess: false });
+  let workoutData2: Workout[] = [];
+  let workoutData3: Workout[] = [];
+  let workoutData4: Workout[] = [];
+  const fromDate = new Date();
 const session = useSession();
-const distance=ref(totaldist());
-const pace=ref(avgpace());
-const calories=ref(totalcalories());
-const duration=ref(totalduration());
-//filters workouts by users id
-const workouts = ref(getWorkouts().filter(w => w.id === session.user?.id));
+onMounted(async () => {
+  if (session.user) {
+    try {
+      const response = await getWorkoutsbyHandleorEmail(session.user.handle);
+      workouts.data = response.data;
+      workouts.total = response.total;
+      workouts.isSuccess = true;
+     workoutData2 =  response.data.filter(workout => new Date(workout.date).getTime() > fromDate.getTime()- 32 * 24 * 60 * 60 * 1000);;
+     workoutData3 =  response.data.filter(workout => new Date(workout.date).getTime() > fromDate.getTime()- 7 * 24 * 60 * 60 * 1000);;
+     workoutData4 =  response.data.filter(workout => new Date(workout.date).getTime() > fromDate.getTime()- 1 * 24 * 60 * 60 * 1000);;
+    } catch (error) {
+      console.error(error);
+      workouts.total = 0;
+      workouts.isSuccess = false;
+    }
+  }
+});
 
 
 </script>
 
 <template>
-    <div class="is-align-items-center">
-      
+    <div class="is-flex is-flex-direction-column is-align-items-center">
      
+  
+      <template v-if="workouts.isSuccess">
+      <Statbox title="All Time" :Workout="workouts.data" />
+    </template>
 
-     <div class="box">
-      <h1>ALL TIME</h1>
-  <li class="quadrant1">Distance: {{distance}} Feet</li>
-  <li class="quadrant2">Pace:{{pace}} MPH</li>
-  <li class="quadrant3">Calories burned:{{calories}}</li>
-  <li class="quadrant4">Time: {{duration}} Minutes</li>
-</div>
+    <template v-if="workouts.isSuccess">
+      <Statbox title="Past Month" :Workout="workoutData2" />
+    </template>
 
- 
-
+    <template v-if="workouts.isSuccess">
+      <Statbox title="Past Week" :Workout="workoutData3" />
+    </template>
+    
+    <template v-if="workouts.isSuccess">
+      <Statbox title="Past Day" :Workout="workoutData4" />
+    </template>
     </div>
   </template>
 
   <style scoped>
-.box {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  width: 500px;
-  height: 200px;
-  background-color: #f1f1f1;
-  border: 1px solid #ccc;
-  padding: 20px;
-  position: relative;
-  margin-top: 10px
-}
 
-.box h1 {
-  position: absolute; 
-  top: 0; 
-  left: 50%; 
-  transform: translateX(-50%); 
-  margin-bottom: 10px; 
-}
-.box li {
-  width: 50%;
-  height: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  text-align: center;
-  border: 1px solid #ccc;
-  padding: 10px;
-}
-
-.box .quadrant1 {
-  background-color: #66c2a5;
-  color: #fff;
-}
-
-.box .quadrant2 {
-  background-color: #fc8d62;
-  color: #fff;
-}
-
-.box .quadrant3 {
-  background-color: #be4242;
-  color: #fff;
-}
-
-.box .quadrant4 {
-  background-color: #2863a2;
-  color: #fff;
-}
 </style>

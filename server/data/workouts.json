@@ -1,7 +1,7 @@
 {
     "workouts": [
         {
-            "sid": 0,
+            
             "id": 1,
             "handle": "JewPaltz",
             "distance": 3097,
@@ -12,7 +12,7 @@
         },
 
         {
-            "sid": 1,
+            
             "id": 1,
             "handle": "JewPaltz",
             "distance": 1222,
@@ -23,7 +23,7 @@
         },
 
         {
-            "sid": 2,
+            
             "id": 1,
             "handle": "JewPaltz",
             "distance": 3000,
@@ -34,7 +34,7 @@
         },
 
         {
-            "sid": 3,
+            
             "id": 4,
             "handle": "gb",
             "distance": 4641,
@@ -45,7 +45,7 @@
         },
 
         {
-            "sid": 4,
+            
             "id": 4,
             "handle": "gb",
             "distance": 2124,
@@ -56,7 +56,7 @@
         },
 
         {
-            "sid": 5,
+            
             "id": 4,
             "handle": "gb",
             "distance": 6246,
@@ -68,7 +68,7 @@
 
 
         {
-            "sid": 6,
+            
             "id":2,
             "handle": "vp",
             "distance": 4252,
@@ -79,7 +79,7 @@
         },
 
         {
-            "sid": 7,
+        
             "id": 2,
             "handle": "vp",
             "distance": 3252,

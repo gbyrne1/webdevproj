@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
-import HomeView from '@/views/Homeview.vue'
+import HomeView from '@/views/HomeView.vue'
 import AdminVue from '@/views/users.vue'
 import LoginVue from '@/views/login.vue'
 import MyActivity from '@/views/myactivity.vue'
@@ -13,18 +13,11 @@ const router = createRouter({
     { path: '/',name: 'home',component: HomeView },
 
     { path: '/login', name: 'login', component: LoginVue },
-    { path: '/users', name: 'admin', component: AdminVue, beforeEnter: adminRoute },
+    { path: '/users', name: 'admin', component: AdminVue, beforeEnter: secureRoute },
     { path: '/myactivity', name: 'myactivity', component: MyActivity, beforeEnter: secureRoute },
     { path: '/friendsactivity', name: 'friendsactivity', component: FriendsActivity, beforeEnter: secureRoute },
     { path: '/peoplesearch', name: 'peoplesearch', component: PeopleSearch, beforeEnter: secureRoute }
-   /* {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
-    }*/
+   
   ]
 })
 
@@ -35,15 +28,10 @@ function secureRoute (to : RouteLocationNormalized, from : RouteLocationNormaliz
   if (session.user) {
       next()
   } else { 
-      next('/login')
+    if(!session.redirectUrl && to.path != '/login') {
+      session.redirectUrl = to.fullPath;
+  }
+  next('/login')
   }
 }
 
-function adminRoute (to : RouteLocationNormalized, from : RouteLocationNormalized, next : NavigationGuardNext ) {
-  const session = useSession();
-  if (session.user?.isAdmin===true) {
-      next()
-  } else { 
-      next('/login')
-  }
-}

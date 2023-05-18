@@ -1,68 +1,120 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useSession, login } from '@/model/session';
-import { getWorkouts} from '@/model/workouts';
+import { useSession } from '@/model/session';
+import workoutbox from '@/components/workoutbox.vue';
+import type { DataListEnvelope } from '@/model/myFetch';
+import { getWorkoutsbyHandleorEmail,addworkout,type Workout } from '@/model/workouts';
 const session = useSession();
+import { ref, onMounted, reactive } from 'vue';
 
-//filters workouts by users id
-const workouts = ref(getWorkouts().filter(w => w.id === session.user?.id));
+const workouts = reactive<DataListEnvelope<Workout>>({ data: [], total: 0, isSuccess: false });
+  const showModal = ref(false);
+  const newWorkout = reactive<Workout>({
+  id: 0,
+  _id: '',
+  handle: '',
+  distance: 0,
+  duration: 0,
+  picture: '',
+  date: '',
+  comment: '',
+});
+  onMounted(async () => {
+  if (session.user) {
+    try {
+      const response = await getWorkoutsbyHandleorEmail(session.user.handle);
+      workouts.data = response.data;
+      workouts.total = response.total;
+      workouts.data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      workouts.isSuccess = true;
+    } catch (error) {
+      console.error(error);
+      workouts.total = 0;
+      workouts.isSuccess = false;
+    }
+  }
+});
 
+const openModal = () => {
+  showModal.value = true;
+  newWorkout.id = session.user?.id || 0;
+  newWorkout.handle = session.user?.handle || '';
+  newWorkout.distance = 0;
+  newWorkout.duration = 0;
+  newWorkout.picture = '';
+  newWorkout.date = new Date().toISOString();
+  newWorkout.comment = '';
+};
 
+const submitWorkout = () => {
+  addworkout(newWorkout);
+  console.log(newWorkout);
+  // Reset the form and close the modal
+  newWorkout.id = 0;
+  newWorkout.handle = '';
+  newWorkout.distance = 0;
+  newWorkout.duration = 0;
+  newWorkout.picture = '';
+  newWorkout.date = '';
+  newWorkout.comment = '';
+  showModal.value = false;
+};
 </script>
 
 <template>
-    <div class="is-align-items-center">
-      
-     
-
-      <div v-for="activity in workouts.sort((a, b) => a.date - b.date)" :key="activity.id">
-          <div class="workout-container">
-            <button class="delete-btn" @click="">X</button>
-            <p>@{{ activity.handle }}</p>
-<p>Distance: {{ activity.distance }} feet</p>
-  <p>Duration: {{ activity.duration }} min</p>
-
-  <p><img class="workout-pic" :src="activity.picture" alt="Workout picture" /></p>
-  <p>Hours Ago: {{ activity.date }}</p>
-  <p v-if="activity.comment">Comment: {{ activity.comment }}</p>
-        </div>
-          
+  <div class="is-align-items-center">
+    <h1 class="title has-text-centered">My Workouts</h1>
+    <button class="button is-primary" @click="openModal">Add Workout</button>
+    <div v-if="workouts.isSuccess">
+      {{ workouts.total }} results found
+      <br /><br />
+      <div v-for="workout in workouts.data" :key="workout.id">
+        <workoutbox :Workout="workout" />
       </div>
     </div>
-  </template>
-  
+        <!-- Modal for adding a new workout -->
+        <div class="modal" :class="{ 'is-active': showModal }">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Add Workout</p>
+          <button class="delete" aria-label="close" @click="showModal = false"></button>
+        </header>
+       
+
+ <section class="modal-card-body">
+          <div class="field">
+            <label class="label">Distance</label>
+            <div class="control">
+              <input class="input" type="text" v-model="newWorkout.distance" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Duration</label>
+            <div class="control">
+              <input class="input" type="text" v-model="newWorkout.duration" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Picture Link</label>
+            <div class="control">
+              <input class="input" type="text" v-model="newWorkout.picture" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Comment</label>
+            <div class="control">
+              <input class="input" type="text" v-model="newWorkout.comment" />
+            </div>
+          </div>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-primary" @click="submitWorkout">Submit</button>
+          <button class="button" @click="showModal = false">Cancel</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
-.workout-container{
-  width: relative;
-  height: relative;
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px;
-  position: relative; 
-}
-
-.workout-pic {
-  width: 200px;
-  height: 200px;
-  object-fit: contain;
-  margin: 0px;
-}
-.delete-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 20px;
-  height: 20px;
-  border: none;
-  background-color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Style the "x" button on hover */
-.delete-btn:hover {
-  color: #f00;
-}
 </style>

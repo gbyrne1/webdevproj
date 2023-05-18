@@ -1,14 +1,42 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useSession } from '@/model/session';
-import { avgpace, getWorkouts,totaldist, totalcalories,totalduration} from '@/model/workouts';
+import type { Workout } from '@/model/workouts';
+import type { DataListEnvelope } from '@/model/myFetch';
+import { avgpace,totaldist, totalcalories,totalduration} from '@/model/workouts';
 const session = useSession();
-const distance=ref(totaldist());
-const pace=ref(avgpace());
-const calories=ref(totalcalories());
-const duration=ref(totalduration());
-//filters workouts by users id
-const workouts = ref(getWorkouts().filter(w => w.id === session.user?.id));
+
+  const props = defineProps({
+    title: {
+      type: String,
+      required: true
+    },
+    Workout: {
+    type: Array as () => Workout[],
+    required: true
+  }
+
+});
+ /* onMounted(async () => {
+  if (session.user) {
+    try {
+      const response = await getWorkoutsbyHandleorEmail(session.user.handle);
+      workouts.data = response.data;
+      workouts.total = response.total;
+      workouts.isSuccess = true;
+      dist.value = totaldist(workouts.data);
+  pace.value = avgpace(workouts.data);
+  calories.value = totalcalories(workouts.data);
+  duration.value = totalduration(workouts.data);
+      console.log(workouts.total);
+    } catch (error) {
+      console.error(error);
+      workouts.total = 0;
+      workouts.isSuccess = false;
+    }
+  }
+});*/
+
 
 
 </script>
@@ -19,14 +47,14 @@ const workouts = ref(getWorkouts().filter(w => w.id === session.user?.id));
      
 
      <div class="box">
-      <h1>ALL TIME</h1>
-  <li class="quadrant1">Distance: {{distance}} Feet</li>
-  <li class="quadrant2">Pace:{{pace}} MPH</li>
-  <li class="quadrant3">Calories burned:{{calories}}</li>
-  <li class="quadrant4">Time: {{duration}} Minutes</li>
+      <h1>{{props.title}}</h1>
+  <li class="quadrant1">Distance: {{totaldist(props.Workout)}} Feet</li>
+  <li class="quadrant2">Pace:{{avgpace(props.Workout)}} MPH</li>
+  <li class="quadrant3">Calories burned:{{totalcalories(props.Workout)}}</li>
+  <li class="quadrant4">Time: {{totalduration(props.Workout)}} Minutes</li>
 </div>
 
- 
+
 
     </div>
   </template>
