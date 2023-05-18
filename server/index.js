@@ -4,7 +4,7 @@ const workouts = require('./controllers/workouts')
 const app = express()
 const users = require('./controllers/users')
 const { requireLogin, parseAuthorizationHeader } = require('./middleware/authorization')
-const hostname = '127.0.0.1';
+const hostname = 'webproject-qg4i.onrender.com';
 const port = process.env.PORT || 3000;
 const path = require('path');
 
